@@ -46,6 +46,7 @@ export interface SimulationResult {
     raceTimeFormatted: string;
   };
   __pagination?: SimulationPagination;
+  __originalStints?: Array<{ compound: string; fromLap: number; toLap: number }>;
 }
 
 interface ResultsViewProps {
@@ -74,7 +75,12 @@ export default function ResultsView({ result }: ResultsViewProps) {
     if (loadingMore || !pagination || !pagination.hasMore) return;
     const raceId = result.race?.id;
     const driverId = result.driver?.id;
-    if (!raceId || !driverId) return;
+    const originalStints = (result as any).__originalStints;
+    
+    if (!raceId || !driverId || !originalStints) {
+      console.warn("Missing required data for pagination:", { raceId, driverId, originalStints });
+      return;
+    }
 
     setLoadingMore(true);
     try {
@@ -84,26 +90,29 @@ export default function ResultsView({ result }: ResultsViewProps) {
         body: JSON.stringify({
           raceId,
           driverId,
-          stints: (result as any).stints?.map((s: StintSummary) => ({
-            compound: s.compound,
-            fromLap: s.fromLap,
-            toLap: s.toLap,
-          })) || [],
+          stints: originalStints,
           limit: pagination.limit || LAPS_PER_PAGE,
           offset: pagination.nextOffset,
         }),
       });
       const json = await res.json();
+      
+      if (json.error) {
+        console.error("Error loading more laps:", json.error);
+        return;
+      }
+      
       const simulationData = json.data?.simulation || json.data?.data?.simulation || json.data;
       const nextPagination = json.data?.pagination || json.data?.data?.pagination;
-      if (simulationData?.laps) {
+      
+      if (simulationData?.laps && Array.isArray(simulationData.laps)) {
         setLaps((prev) => [...prev, ...simulationData.laps]);
       }
       if (nextPagination) {
         setPagination(nextPagination);
       }
-    } catch {
-      // silencioso
+    } catch (error) {
+      console.error("Failed to load more laps:", error);
     } finally {
       setLoadingMore(false);
     }

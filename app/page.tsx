@@ -54,8 +54,6 @@ export default function Home() {
           raceId: selectedRaceId,
           driverId: selectedDriverId,
           stints,
-          limit: 20,
-          offset: 0,
         }),
       });
       const json = await res.json();
@@ -67,6 +65,10 @@ export default function Home() {
       const pagination = json.data?.pagination || json.data?.data?.pagination;
       if (simulationData && pagination) {
         (simulationData as any).__pagination = pagination;
+      }
+      // Guardar los stints originales para paginación
+      if (simulationData) {
+        (simulationData as any).__originalStints = stints;
       }
       setResult(simulationData);
     } catch (err) {
