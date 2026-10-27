@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
+  serverExternalPackages: ["sequelize", "pg", "pg-hstore"],
   turbopack: {
     rules: {
       "*.css": {
