@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Sequelize CLI artifacts (CommonJS, required by the CLI):
+    "config/**/*.js",
+    "models/**/*.js",
+    "migrations/**/*.js",
+    "seeders/**/*.js",
   ]),
 ]);
 
