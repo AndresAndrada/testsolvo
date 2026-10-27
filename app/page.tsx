@@ -54,6 +54,8 @@ export default function Home() {
           raceId: selectedRaceId,
           driverId: selectedDriverId,
           stints,
+          limit: 20,
+          offset: 0,
         }),
       });
       const json = await res.json();
@@ -61,7 +63,12 @@ export default function Home() {
         setError(json.error.message || "Error en la simulación");
         return;
       }
-      setResult(json.data?.simulation || json.data);
+      const simulationData = json.data?.simulation || json.data?.data?.simulation || json.data;
+      const pagination = json.data?.pagination || json.data?.data?.pagination;
+      if (simulationData && pagination) {
+        (simulationData as any).__pagination = pagination;
+      }
+      setResult(simulationData);
     } catch (err) {
       setError("Error al conectar con el servidor");
     } finally {
@@ -70,58 +77,107 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-semibold text-gray-900">F1 Race Strategist</h1>
-          <p className="mt-1 text-sm text-gray-600">
-            Simulador de estrategias de carrera con desglose lap by lap
-          </p>
+    <div className="min-h-screen bg-[#050505] text-zinc-100">
+      <header className="relative border-b border-red-600/40 bg-gradient-to-r from-black via-[#0a0a0a] to-black">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500 to-transparent" />
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="flex items-center gap-3">
+                <div className="h-6 w-1 bg-red-600" />
+                <p className="text-xs uppercase tracking-[0.4em] text-red-500">Formula 1</p>
+              </div>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Race Strategist</h1>
+              <p className="mt-2 text-sm text-zinc-400">
+                Simulador de estrategia con desgaste de neumáticos, paradas y clima
+              </p>
+            </div>
+            <div className="text-xs uppercase tracking-[0.3em] text-zinc-600">Pit Wall Control</div>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Panel de configuración */}
-          <div className="space-y-6 lg:col-span-1">
-            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-              <h2 className="mb-3 text-base font-medium text-gray-900">Configuración</h2>
-              <div className="space-y-4">
-                <RaceSelector selectedRaceId={selectedRaceId} onSelectRace={handleRaceSelect} />
-                <DriverSelector selectedDriverId={selectedDriverId} onSelectDriver={setSelectedDriverId} />
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[380px_1fr]">
+          <div className="space-y-6">
+            <section className="relative overflow-hidden rounded-sm border border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent shadow-[0_40px_80px_-60px_rgba(239,68,68,0.6)]">
+              <div className="absolute -top-24 right-0 h-48 w-48 rounded-full bg-red-600/10 blur-3xl" />
+              <div className="relative p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Configuración</p>
+                    <h2 className="mt-1 text-lg font-medium">Gran Premio</h2>
+                  </div>
+                  <div className="h-px w-16 bg-gradient-to-r from-red-500 to-transparent" />
+                </div>
+                <div className="mt-4 space-y-4">
+                  <RaceSelector selectedRaceId={selectedRaceId} onSelectRace={handleRaceSelect} />
+                  <DriverSelector selectedDriverId={selectedDriverId} onSelectDriver={setSelectedDriverId} />
+                </div>
+              </div>
+            </section>
+
+            <section className="relative overflow-hidden rounded-sm border border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent">
+              <div className="absolute -bottom-20 left-10 h-40 w-40 rounded-full bg-red-500/5 blur-3xl" />
+              <div className="relative p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Estrategia</p>
+                    <h2 className="mt-1 text-lg font-medium">Plan de stints</h2>
+                  </div>
+                  <div className="h-px w-16 bg-gradient-to-r from-red-500 to-transparent" />
+                </div>
+                <div className="mt-4">
+                  <StrategyBuilder raceLaps={raceLaps} stints={stints} onChangeStints={setStints} />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSimulate}
+                  disabled={loading || !selectedRaceId || !selectedDriverId || stints.length === 0}
+                  className="mt-5 w-full rounded-sm bg-gradient-to-r from-red-600 to-red-500 px-4 py-2 text-sm font-medium uppercase tracking-[0.25em] text-white shadow-[0_20px_60px_-30px_rgba(239,68,68,0.9)] transition hover:from-red-500 hover:to-red-400 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {loading ? "Simulando..." : "Lanzar simulación"}
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <section className="relative overflow-hidden rounded-sm border border-white/5 bg-gradient-to-b from-white/[0.02] to-transparent">
+            <div className="absolute -top-32 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-red-600/8 blur-3xl" />
+            <div className="relative p-5 sm:p-8">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Telemetría</p>
+                  <h2 className="mt-1 text-lg font-medium">Desglose de carrera</h2>
+                </div>
+                <div className="h-px flex-1 bg-gradient-to-r from-red-500/60 to-transparent sm:mx-6" />
+              </div>
+              <div className="mt-6">
+                {error && (
+                  <div className="mb-6 rounded-sm border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
+                    {error}
+                  </div>
+                )}
+                {!result && !error && !loading && (
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <div className="h-1 w-10 bg-red-600" />
+                    <p className="mt-4 text-sm uppercase tracking-[0.3em] text-zinc-500">En espera</p>
+                    <p className="mt-2 max-w-sm text-sm text-zinc-400">
+                      Configura carrera, piloto y estrategia para obtener el desglose lap by lap
+                    </p>
+                  </div>
+                )}
+                {loading && (
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <div className="h-1 w-10 animate-pulse bg-red-500" />
+                    <p className="mt-4 text-sm uppercase tracking-[0.3em] text-zinc-500">Procesando</p>
+                    <p className="mt-2 text-sm text-zinc-400">Calculando estrategia...</p>
+                  </div>
+                )}
+                {result && <ResultsView result={result} />}
               </div>
             </div>
-
-            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-              <StrategyBuilder raceLaps={raceLaps} stints={stints} onChangeStints={setStints} />
-              <button
-                type="button"
-                onClick={handleSimulate}
-                disabled={loading || !selectedRaceId || !selectedDriverId || stints.length === 0}
-                className="mt-4 w-full rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-              >
-                {loading ? "Simulando..." : "Simular estrategia"}
-              </button>
-            </div>
-          </div>
-
-          {/* Panel de resultados */}
-          <div className="lg:col-span-2">
-            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-              {error && (
-                <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">{error}</div>
-              )}
-              {!result && !error && !loading && (
-                <div className="py-12 text-center text-sm text-gray-500">
-                  Configura una carrera, piloto y estrategia para simular
-                </div>
-              )}
-              {loading && (
-                <div className="py-12 text-center text-sm text-gray-500">Simulando carrera...</div>
-              )}
-              {result && <ResultsView result={result} />}
-            </div>
-          </div>
+          </section>
         </div>
       </main>
     </div>

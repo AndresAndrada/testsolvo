@@ -49,56 +49,51 @@ export default function RaceSelector({ selectedRaceId, onSelectRace }: RaceSelec
   }, []);
 
   if (loading) {
-    return <div className="text-sm text-gray-600">Cargando carreras...</div>;
+    return <div className="text-sm text-zinc-400">Cargando calendario...</div>;
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return <div className="text-sm text-red-400">{error}</div>;
   }
+
+  const selectedRace = races.find((r) => r.id === selectedRaceId);
 
   return (
     <div className="space-y-2">
-      <label htmlFor="race" className="block text-sm font-medium text-gray-900">
-        Seleccionar carrera
+      <label htmlFor="race" className="text-xs uppercase tracking-[0.25em] text-zinc-500">
+        Carrera
       </label>
       <select
         id="race"
         value={selectedRaceId || ""}
         onChange={(e) => onSelectRace(e.target.value)}
-        className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="mt-1 w-full rounded-sm border border-white/10 bg-black/65 px-3 py-2 text-sm text-zinc-100 shadow-[0_20px_60px_-40px_rgba(239,68,68,0.8)] transition focus:border-red-500/60 focus:outline-none focus:ring-0"
       >
-        <option value="">-- Selecciona una carrera --</option>
+        <option value="">Seleccionar gran premio</option>
         {races.map((race) => (
           <option key={race.id} value={race.id}>
-            Ronda {race.round}: {race.name} ({race.circuit?.name || race.circuitId})
+            R{race.round} · {race.name}
           </option>
         ))}
       </select>
-      {selectedRaceId && (
-        <div className="mt-2 rounded-md bg-gray-50 p-3 text-xs text-gray-700">
-          {(() => {
-            const race = races.find((r) => r.id === selectedRaceId);
-            if (!race) return null;
-            return (
-              <div className="space-y-1">
-                <div>
-                  <span className="font-medium">Vueltas:</span> {race.laps}
-                </div>
-                <div>
-                  <span className="font-medium">Temperatura:</span> {race.temperature}°C
-                </div>
-                <div>
-                  <span className="font-medium">Probabilidad de lluvia:</span>{" "}
-                  {(race.rainProbability * 100).toFixed(0)}%
-                </div>
-                {race.circuit && (
-                  <div>
-                    <span className="font-medium">Circuito:</span> {race.circuit.name} ({race.circuit.country})
-                  </div>
-                )}
-              </div>
-            );
-          })()}
+      {selectedRace && (
+        <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-zinc-400">
+          <div className="rounded-sm border border-white/5 px-2 py-1">
+            <span className="text-zinc-500">Vueltas</span>
+            <div className="text-zinc-200">{selectedRace.laps}</div>
+          </div>
+          <div className="rounded-sm border border-white/5 px-2 py-1">
+            <span className="text-zinc-500">Temp.</span>
+            <div className="text-zinc-200">{selectedRace.temperature}°C</div>
+          </div>
+          <div className="rounded-sm border border-white/5 px-2 py-1">
+            <span className="text-zinc-500">Lluvia</span>
+            <div className="text-zinc-200">{(selectedRace.rainProbability * 100).toFixed(0)}%</div>
+          </div>
+          <div className="rounded-sm border border-white/5 px-2 py-1">
+            <span className="text-zinc-500">Circuito</span>
+            <div className="truncate text-zinc-200">{selectedRace.circuit?.name || selectedRace.circuitId}</div>
+          </div>
         </div>
       )}
     </div>

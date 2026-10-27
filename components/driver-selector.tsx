@@ -36,6 +36,7 @@ export default function DriverSelector({ selectedDriverId, onSelectDriver }: Dri
           fetch("/api/drivers"),
           fetch("/api/teams"),
         ]);
+
         const driversJson = await driversRes.json();
         const teamsJson = await teamsRes.json();
 
@@ -64,53 +65,48 @@ export default function DriverSelector({ selectedDriverId, onSelectDriver }: Dri
   };
 
   if (loading) {
-    return <div className="text-sm text-gray-600">Cargando pilotos...</div>;
+    return <div className="text-sm text-zinc-400">Cargando parrilla...</div>;
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return <div className="text-sm text-red-400">{error}</div>;
   }
+
+  const selectedDriver = drivers.find((d) => d.id === selectedDriverId);
+  const selectedTeam = selectedDriver ? teams.find((t) => t.id === selectedDriver.teamId) : null;
 
   return (
     <div className="space-y-2">
-      <label htmlFor="driver" className="block text-sm font-medium text-gray-900">
-        Seleccionar piloto
+      <label htmlFor="driver" className="text-xs uppercase tracking-[0.25em] text-zinc-500">
+        Piloto
       </label>
       <select
         id="driver"
         value={selectedDriverId || ""}
         onChange={(e) => onSelectDriver(e.target.value)}
-        className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="mt-1 w-full rounded-sm border border-white/10 bg-black/65 px-3 py-2 text-sm text-zinc-100 shadow-[0_20px_60px_-40px_rgba(239,68,68,0.8)] transition focus:border-red-500/60 focus:outline-none focus:ring-0"
       >
-        <option value="">-- Selecciona un piloto --</option>
+        <option value="">Seleccionar piloto</option>
         {drivers.map((driver) => (
           <option key={driver.id} value={driver.id}>
-            #{driver.number} {driver.name} - {getTeamName(driver.teamId)}
+            #{driver.number} · {driver.name} · {getTeamName(driver.teamId)}
           </option>
         ))}
       </select>
-      {selectedDriverId && (
-        <div className="mt-2 rounded-md bg-gray-50 p-3 text-xs text-gray-700">
-          {(() => {
-            const driver = drivers.find((d) => d.id === selectedDriverId);
-            if (!driver) return null;
-            const team = teams.find((t) => t.id === driver.teamId);
-            return (
-              <div className="space-y-1">
-                <div>
-                  <span className="font-medium">Ritmo:</span> {(driver.pace * 100).toFixed(0)}%
-                </div>
-                <div>
-                  <span className="font-medium">Consistencia:</span> {(driver.consistency * 100).toFixed(0)}%
-                </div>
-                {team && (
-                  <div>
-                    <span className="font-medium">Rendimiento del coche:</span> {(team.carPerformance * 100).toFixed(0)}%
-                  </div>
-                )}
-              </div>
-            );
-          })()}
+      {selectedDriver && (
+        <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-zinc-400">
+          <div className="rounded-sm border border-white/5 px-2 py-1">
+            <span className="text-zinc-500">Ritmo</span>
+            <div className="text-zinc-200">{(selectedDriver.pace * 100).toFixed(0)}%</div>
+          </div>
+          <div className="rounded-sm border border-white/5 px-2 py-1">
+            <span className="text-zinc-500">Consistencia</span>
+            <div className="text-zinc-200">{(selectedDriver.consistency * 100).toFixed(0)}%</div>
+          </div>
+          <div className="rounded-sm border border-white/5 px-2 py-1">
+            <span className="text-zinc-500">Coche</span>
+            <div className="text-zinc-200">{selectedTeam ? `${(selectedTeam.carPerformance * 100).toFixed(0)}%` : "-"}</div>
+          </div>
         </div>
       )}
     </div>

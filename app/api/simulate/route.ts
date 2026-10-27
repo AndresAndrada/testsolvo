@@ -113,6 +113,10 @@ export async function POST(request: NextRequest) {
     stints = parsedStrategy.data.stints;
   }
 
+  const bodyObj = body as Record<string, unknown>;
+  const limit = typeof bodyObj.limit === "number" && bodyObj.limit > 0 ? Math.min(bodyObj.limit, 100) : 20;
+  const offset = typeof bodyObj.offset === "number" && bodyObj.offset >= 0 ? bodyObj.offset : 0;
+
   try {
     const [race, drivers, tyres] = await Promise.all([
       getRaceById(raceId),
@@ -172,10 +176,27 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const totalLaps = Array.isArray(simulation.laps) ? simulation.laps.length : 0;
+    const paginatedLaps = Array.isArray(simulation.laps)
+      ? simulation.laps.slice(offset, offset + limit)
+      : [];
+    const hasMore = offset + paginatedLaps.length < totalLaps;
+    const nextOffset = hasMore ? offset + paginatedLaps.length : offset + paginatedLaps.length;
+
     return ok({
-      simulation,
+      simulation: {
+        ...simulation,
+        laps: paginatedLaps,
+      },
       strategyId: savedStrategy ? savedStrategy.id : null,
       persisted: savedStrategy !== null,
+      pagination: {
+        limit,
+        offset,
+        totalItems: totalLaps,
+        hasMore,
+        nextOffset,
+      },
     });
   } catch (error) {
     if (error instanceof F1ApiError && error.status === 404) {
