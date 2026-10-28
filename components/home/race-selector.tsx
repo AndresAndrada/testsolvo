@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useLanguageStore from "@/stores/languageStore";
 
 export interface Race {
   id: string;
@@ -27,6 +28,7 @@ export default function RaceSelector({ selectedRaceId, onSelectRace }: RaceSelec
   const [races, setRaces] = useState<Race[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useLanguageStore();
 
   useEffect(() => {
     const fetchRaces = async () => {
@@ -35,21 +37,21 @@ export default function RaceSelector({ selectedRaceId, onSelectRace }: RaceSelec
         const res = await fetch("/api/races");
         const json = await res.json();
         if (json.error) {
-          setError(json.error.message || "Error al cargar carreras");
+          setError(json.error.message || t('raceSelector.error'));
           return;
         }
         setRaces(json.data?.races || []);
       } catch (err) {
-        setError("Error al conectar con el servidor");
+        setError(t('raceSelector.errorServer'));
       } finally {
         setLoading(false);
       }
     };
     fetchRaces();
-  }, []);
+  }, [t]);
 
   if (loading) {
-    return <div className="text-sm text-zinc-400">Cargando calendario...</div>;
+    return <div className="text-sm text-zinc-400">{t('raceSelector.loading')}</div>;
   }
 
   if (error) {
@@ -61,7 +63,7 @@ export default function RaceSelector({ selectedRaceId, onSelectRace }: RaceSelec
   return (
     <div className="space-y-2">
       <label htmlFor="race" className="text-xs uppercase tracking-[0.25em] text-zinc-500">
-        Carrera
+        {t('raceSelector.selectRace')}
       </label>
       <select
         id="race"
@@ -69,7 +71,7 @@ export default function RaceSelector({ selectedRaceId, onSelectRace }: RaceSelec
         onChange={(e) => onSelectRace(e.target.value)}
         className="mt-1 w-full rounded-sm border border-white/10 bg-black/65 px-3 py-2 text-sm text-zinc-100 shadow-[0_20px_60px_-40px_rgba(239,68,68,0.8)] transition focus:border-red-500/60 focus:outline-none focus:ring-0"
       >
-        <option value="">Seleccionar gran premio</option>
+        <option value="">{t('raceSelector.selectGrandPrix')}</option>
         {races.map((race) => (
           <option key={race.id} value={race.id}>
             R{race.round} · {race.name}
@@ -79,19 +81,19 @@ export default function RaceSelector({ selectedRaceId, onSelectRace }: RaceSelec
       {selectedRace && (
         <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-zinc-400">
           <div className="rounded-sm border border-white/5 px-2 py-1">
-            <span className="text-zinc-500">Vueltas</span>
+            <span className="text-zinc-500">{t('raceSelector.laps')}</span>
             <div className="text-zinc-200">{selectedRace.laps}</div>
           </div>
           <div className="rounded-sm border border-white/5 px-2 py-1">
-            <span className="text-zinc-500">Temp.</span>
+            <span className="text-zinc-500">{t('raceSelector.temperature')}</span>
             <div className="text-zinc-200">{selectedRace.temperature}°C</div>
           </div>
           <div className="rounded-sm border border-white/5 px-2 py-1">
-            <span className="text-zinc-500">Lluvia</span>
+            <span className="text-zinc-500">{t('raceSelector.rain')}</span>
             <div className="text-zinc-200">{(selectedRace.rainProbability * 100).toFixed(0)}%</div>
           </div>
           <div className="rounded-sm border border-white/5 px-2 py-1">
-            <span className="text-zinc-500">Circuito</span>
+            <span className="text-zinc-500">{t('raceSelector.circuit')}</span>
             <div className="truncate text-zinc-200">{selectedRace.circuit?.name || selectedRace.circuitId}</div>
           </div>
         </div>

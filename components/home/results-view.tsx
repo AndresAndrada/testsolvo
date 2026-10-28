@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import useLanguageStore from "@/stores/languageStore";
 
 export interface LapDetail {
   lap: number;
@@ -60,6 +61,7 @@ function formatSeconds(seconds: number): string {
 const LAPS_PER_PAGE = 20;
 
 export default function ResultsView({ result }: ResultsViewProps) {
+  const { t } = useLanguageStore();
   const [laps, setLaps] = useState<LapDetail[]>([]);
   const [pagination, setPagination] = useState<SimulationPagination | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -152,32 +154,32 @@ export default function ResultsView({ result }: ResultsViewProps) {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Resultado</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">{t('resultsView.result')}</p>
         <h2 className="mt-1 text-xl font-medium">{result.race.name}</h2>
         <p className="mt-1 text-sm text-zinc-400">
-          {result?.race?.circuitName ? result.race.circuitName : 'Circuito'} · {result.driver.name} · {result.team.name}
+          {result?.race?.circuitName ? result.race.circuitName : t('resultsView.circuit')} · {result.driver.name} · {result.team.name}
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="relative overflow-hidden rounded-sm border border-red-500/40 bg-gradient-to-br from-red-500/10 to-transparent p-4">
           <div className="absolute right-0 top-0 h-px w-16 bg-red-500" />
-          <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">Tiempo total</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">{t('resultsView.totalTime')}</p>
           <p className="mt-2 text-2xl font-medium">{result.totals.raceTimeFormatted}</p>
         </div>
         <div className="rounded-sm border border-white/5 bg-white/[0.01] p-4">
-          <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">Vueltas</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">{t('resultsView.laps')}</p>
           <p className="mt-2 text-lg text-zinc-200">{formatSeconds(result.totals.lapTimeSeconds)}</p>
         </div>
         <div className="rounded-sm border border-white/5 bg-white/[0.01] p-4">
-          <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">Pit stops</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">{t('resultsView.pitStops')}</p>
           <p className="mt-2 text-lg text-zinc-200">{formatSeconds(result.totals.pitLossSeconds)}</p>
         </div>
       </div>
 
       <div>
         <div className="flex items-center justify-between">
-          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Stints</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">{t('resultsView.stints')}</p>
           <div className="h-px w-24 bg-gradient-to-r from-red-500/60 to-transparent" />
         </div>
         <div className="mt-3 overflow-x-auto">
@@ -185,11 +187,11 @@ export default function ResultsView({ result }: ResultsViewProps) {
             <thead>
               <tr className="border-b border-white/5 text-left text-xs uppercase tracking-[0.2em] text-zinc-500">
                 <th className="px-3 py-2">#</th>
-                <th className="px-3 py-2">Compuesto</th>
-                <th className="px-3 py-2">Vueltas</th>
-                <th className="px-3 py-2">Tiempo</th>
-                <th className="px-3 py-2">Media</th>
-                <th className="px-3 py-2">Pérdida</th>
+                <th className="px-3 py-2">{t('resultsView.compound')}</th>
+                <th className="px-3 py-2">{t('resultsView.laps')}</th>
+                <th className="px-3 py-2">{t('resultsView.time')}</th>
+                <th className="px-3 py-2">{t('resultsView.average')}</th>
+                <th className="px-3 py-2">{t('resultsView.loss')}</th>
               </tr>
             </thead>
             <tbody>
@@ -198,7 +200,7 @@ export default function ResultsView({ result }: ResultsViewProps) {
                   <td className="px-3 py-2 text-zinc-500">{idx + 1}</td>
                   <td className="px-3 py-2 text-zinc-200">{stint.compound}</td>
                   <td className="px-3 py-2 text-zinc-400">
-                    V{stint.fromLap}–V{stint.toLap} · {stint.laps}
+                    {t('resultsView.lapShort')}{stint.fromLap}–{t('resultsView.lapShort')}{stint.toLap} · {stint.laps}
                   </td>
                   <td className="px-3 py-2 text-zinc-200">{formatSeconds(stint.stintTimeSeconds)}</td>
                   <td className="px-3 py-2 text-zinc-400">{formatSeconds(stint.avgLapTimeSeconds)}</td>
@@ -214,10 +216,10 @@ export default function ResultsView({ result }: ResultsViewProps) {
 
       <div>
         <div className="flex items-center justify-between">
-          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Lap by lap</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">{t('resultsView.lapByLap')}</p>
           <div className="flex items-center gap-3">
             <span className="text-xs text-zinc-600">
-              Mostrando {displayedLaps.length} de {totalItems}
+              {t('resultsView.showing')} {displayedLaps.length} {t('resultsView.of')} {totalItems}
             </span>
             <div className="h-px w-24 bg-gradient-to-r from-red-500/60 to-transparent" />
           </div>
@@ -229,16 +231,16 @@ export default function ResultsView({ result }: ResultsViewProps) {
           <table className="min-w-full text-xs">
             <thead className="sticky top-0 bg-[#050505]">
               <tr className="border-b border-white/5 text-left uppercase tracking-[0.2em] text-zinc-500">
-                <th className="px-3 py-2">V</th>
-                <th className="px-3 py-2">Stint</th>
-                <th className="px-3 py-2">Comp</th>
-                <th className="px-3 py-2">Vuelta</th>
-                <th className="px-3 py-2">Base</th>
-                <th className="px-3 py-2">Piloto</th>
-                <th className="px-3 py-2">Coche</th>
-                <th className="px-3 py-2">Neum.</th>
-                <th className="px-3 py-2">Desgaste</th>
-                <th className="px-3 py-2">Lluvia</th>
+                <th className="px-3 py-2">{t('resultsView.lapShort')}</th>
+                <th className="px-3 py-2">{t('resultsView.stint')}</th>
+                <th className="px-3 py-2">{t('resultsView.comp')}</th>
+                <th className="px-3 py-2">{t('resultsView.lap')}</th>
+                <th className="px-3 py-2">{t('resultsView.base')}</th>
+                <th className="px-3 py-2">{t('resultsView.driver')}</th>
+                <th className="px-3 py-2">{t('resultsView.team')}</th>
+                <th className="px-3 py-2">{t('resultsView.tyre')}</th>
+                <th className="px-3 py-2">{t('resultsView.wear')}</th>
+                <th className="px-3 py-2">{t('resultsView.rain')}</th>
               </tr>
             </thead>
             <tbody>
@@ -266,7 +268,7 @@ export default function ResultsView({ result }: ResultsViewProps) {
                     <div className="flex flex-col items-center gap-2">
                       <div className="h-1 w-12 animate-pulse bg-red-500/40" />
                       <p className="text-xs uppercase tracking-[0.3em] text-zinc-600">
-                        {loadingMore ? "Cargando más vueltas..." : "Desplaza para cargar más"}
+                        {loadingMore ? t('resultsView.loadingMore') : t('resultsView.scrollMore')}
                       </p>
                     </div>
                   </td>

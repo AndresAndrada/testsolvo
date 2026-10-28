@@ -6,6 +6,8 @@ import DriverSelector from "@/components/home/driver-selector";
 import StrategyBuilder, { type Stint } from "@/components/home/strategy-builder";
 import ResultsView, { type SimulationResult } from "@/components/home/results-view";
 import NavigationTabs from "@/components/ui/navigation-tabs";
+import Navbar from "@/components/navBar/navbar";
+import useLanguageStore from "@/stores/languageStore";
 
 interface SavedStrategy {
   id: number;
@@ -34,7 +36,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SimulationResult | null>(null);
-  const [strategyName, setStrategyName] = useState("Estrategia Principal");
+  const [strategyName, setStrategyName] = useState("");
   const [savedStrategies, setSavedStrategies] = useState<SavedStrategy[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [activeTab, setActiveTab] = useState("nueva");
@@ -42,6 +44,7 @@ export default function Home() {
   const [loadingMoreStrategies, setLoadingMoreStrategies] = useState(false);
   const strategyObserverRef = useRef<HTMLTableRowElement | null>(null);
   const strategyScrollRef = useRef<HTMLDivElement | null>(null);
+  const { t } = useLanguageStore();
 
   const handleRaceSelect = async (raceId: string) => {
     setSelectedRaceId(raceId);
@@ -56,13 +59,13 @@ export default function Home() {
       const res = await fetch(`/api/races/${raceId}`);
       const json = await res.json();
       if (json.error) {
-        setError(json.error.message || "Error al cargar datos de la carrera");
+        setError(json.error.message || t('page.errorLoadingRace'));
         return;
       }
       const race = json.data?.race || json.data;
       setRaceLaps(race?.laps || 0);
     } catch (err) {
-      setError("Error al cargar datos de la carrera");
+      setError(t('page.errorLoadingRace'));
     }
   };
 
@@ -136,11 +139,11 @@ export default function Home() {
 
   const handleSaveAndSimulate = async () => {
     if (!selectedRaceId || !selectedDriverId || stints.length === 0) {
-      setError("Selecciona carrera, piloto y define al menos un stint");
+      setError(t('page.selectRaceDriverStints'));
       return;
     }
     if (!strategyName.trim()) {
-      setError("Introduce un nombre para la estrategia");
+      setError(t('page.enterStrategyName'));
       return;
     }
     setLoading(true);
@@ -159,14 +162,14 @@ export default function Home() {
       });
       const createJson = await createRes.json();
       if (createJson.error) {
-        setError(createJson.error.message || "Error al guardar la estrategia");
+        setError(createJson.error.message || t('page.errorSavingStrategy'));
         setLoading(false);
         return;
       }
       const strategy = createJson.data?.strategy || createJson.strategy;
       const strategyId = strategy?.id;
       if (!strategyId) {
-        setError("No se pudo obtener el ID de la estrategia");
+        setError(t('page.errorGettingStrategyId'));
         setLoading(false);
         return;
       }
@@ -182,7 +185,7 @@ export default function Home() {
       });
       const simJson = await simRes.json();
       if (simJson.error) {
-        setError(simJson.error.message || "Error en la simulación");
+        setError(simJson.error.message || t('page.errorSimulation'));
         fetchSavedStrategies(false);
         setLoading(false);
         return;
@@ -199,7 +202,7 @@ export default function Home() {
       setResult(simulationData);
       fetchSavedStrategies(false);
     } catch {
-      setError("Error al conectar con el servidor");
+      setError(t('page.errorConnectingServer'));
     } finally {
       setLoading(false);
     }
@@ -207,7 +210,7 @@ export default function Home() {
 
   const handleSimulate = async () => {
     if (!selectedRaceId || !selectedDriverId || stints.length === 0) {
-      setError("Selecciona carrera, piloto y define al menos un stint");
+      setError(t('page.selectRaceDriverStints'));
       return;
     }
     setLoading(true);
@@ -227,7 +230,7 @@ export default function Home() {
       });
       const json = await res.json();
       if (json.error) {
-        setError(json.error.message || "Error en la simulación");
+        setError(json.error.message || t('page.errorSimulation'));
         return;
       }
       const simulationData = json.data?.simulation || json.data?.data?.simulation || json.data;
@@ -241,7 +244,7 @@ export default function Home() {
       }
       setResult(simulationData);
     } catch {
-      setError("Error al conectar con el servidor");
+      setError(t('page.errorConnectingServer'));
     } finally {
       setLoading(false);
     }
@@ -249,24 +252,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100">
-      <header className="relative border-b border-red-600/40 bg-gradient-to-r from-black via-[#0a0a0a] to-black">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500 to-transparent" />
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <div className="h-6 w-1 bg-red-600" />
-                <p className="text-xs uppercase tracking-[0.4em] text-red-500">Formula 1</p>
-              </div>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Race Strategist</h1>
-              <p className="mt-2 text-sm text-zinc-400">
-                Simulador de estrategia con desgaste de neumáticos, paradas y clima
-              </p>
-            </div>
-            <div className="text-xs uppercase tracking-[0.3em] text-zinc-600">Pit Wall Control</div>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <NavigationTabs activeTab={activeTab} onTabChange={setActiveTab} />
@@ -278,8 +264,8 @@ export default function Home() {
                 <div className="relative p-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Configuración</p>
-                      <h2 className="mt-1 text-lg font-medium">Gran Premio</h2>
+                      <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">{t('page.configuration')}</p>
+                      <h2 className="mt-1 text-lg font-medium">{t('page.grandPrix')}</h2>
                     </div>
                     <div className="h-px w-16 bg-gradient-to-r from-red-500 to-transparent" />
                   </div>
@@ -295,8 +281,8 @@ export default function Home() {
                 <div className="relative p-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Estrategia</p>
-                      <h2 className="mt-1 text-lg font-medium">Plan de stints</h2>
+                      <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">{t('page.strategy')}</p>
+                      <h2 className="mt-1 text-lg font-medium">{t('page.stintPlan')}</h2>
                     </div>
                     <div className="h-px w-16 bg-gradient-to-r from-red-500 to-transparent" />
                   </div>
@@ -304,13 +290,13 @@ export default function Home() {
                     <StrategyBuilder raceLaps={raceLaps} stints={stints} onChangeStints={setStints} />
                   </div>
                   <div className="mt-4 space-y-2">
-                    <label className="text-xs uppercase tracking-[0.25em] text-zinc-500">Nombre de la estrategia</label>
+                    <label className="text-xs uppercase tracking-[0.25em] text-zinc-500">{t('page.strategyName')}</label>
                     <input
                       type="text"
                       value={strategyName}
                       onChange={(e) => setStrategyName(e.target.value)}
                       className="w-full rounded-sm border border-white/10 bg-black/40 px-3 py-2 text-sm text-zinc-100 focus:border-red-500/60 focus:outline-none"
-                      placeholder="Estrategia Principal"
+                      placeholder={t('page.strategyNamePlaceholder')}
                     />
                   </div>
                   <div className="mt-4 flex flex-col gap-2">
@@ -320,7 +306,7 @@ export default function Home() {
                       disabled={loading || !selectedRaceId || !selectedDriverId || stints.length === 0}
                       className="w-full rounded-sm bg-gradient-to-r from-red-600 to-red-500 px-4 py-2 text-sm font-medium uppercase tracking-[0.25em] text-white shadow-[0_20px_60px_-30px_rgba(239,68,68,0.9)] transition hover:from-red-500 hover:to-red-400 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      {loading ? "Guardando y simulando..." : "Guardar y Simular"}
+                      {loading ? t('page.savingAndSimulating') : t('page.saveAndSimulate')}
                     </button>
                     <button
                       type="button"
@@ -328,7 +314,7 @@ export default function Home() {
                       disabled={loading || !selectedRaceId || !selectedDriverId || stints.length === 0}
                       className="w-full rounded-sm border border-white/10 px-4 py-2 text-xs uppercase tracking-[0.25em] text-zinc-300 transition hover:border-white/30 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      Simular sin guardar
+                      {t('page.simulateWithoutSaving')}
                     </button>
                   </div>
                 </div>
@@ -340,8 +326,8 @@ export default function Home() {
               <div className="relative p-5 sm:p-8">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Telemetría</p>
-                    <h2 className="mt-1 text-lg font-medium">Desglose de carrera</h2>
+                    <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">{t('page.telemetry')}</p>
+                    <h2 className="mt-1 text-lg font-medium">{t('page.raceBreakdown')}</h2>
                   </div>
                   <div className="h-px flex-1 bg-gradient-to-r from-red-500/60 to-transparent sm:mx-6" />
                 </div>
@@ -354,17 +340,17 @@ export default function Home() {
                   {!result && !error && !loading && (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
                       <div className="h-1 w-10 bg-red-600" />
-                      <p className="mt-4 text-sm uppercase tracking-[0.3em] text-zinc-500">En espera</p>
+                      <p className="mt-4 text-sm uppercase tracking-[0.3em] text-zinc-500">{t('page.waiting')}</p>
                       <p className="mt-2 max-w-sm text-sm text-zinc-400">
-                        Configura carrera, piloto y estrategia para obtener el desglose lap by lap
+                        {t('page.waitingDescription')}
                       </p>
                     </div>
                   )}
                   {loading && (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
                       <div className="h-1 w-10 animate-pulse bg-red-500" />
-                      <p className="mt-4 text-sm uppercase tracking-[0.3em] text-zinc-500">Procesando</p>
-                      <p className="mt-2 text-sm text-zinc-400">Guardando y calculando estrategia...</p>
+                      <p className="mt-4 text-sm uppercase tracking-[0.3em] text-zinc-500">{t('page.processing')}</p>
+                      <p className="mt-2 text-sm text-zinc-400">{t('page.processingDescription')}</p>
                     </div>
                   )}
                   {result && <ResultsView result={result} />}
@@ -379,21 +365,21 @@ export default function Home() {
             <div className="relative p-5 sm:p-8">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Historial</p>
-                  <h2 className="mt-1 text-lg font-medium">Simulaciones Guardadas</h2>
+                  <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">{t('page.history')}</p>
+                  <h2 className="mt-1 text-lg font-medium">{t('page.savedSimulations')}</h2>
                 </div>
                 <button
                   type="button"
                   onClick={() => fetchSavedStrategies()}
                   className="text-xs uppercase tracking-[0.25em] text-zinc-500 hover:text-zinc-300 border border-white/10 hover:border-white/30 p-2"
                 >
-                  Actualizar
+                  {t('page.refresh')}
                 </button>
               </div>
               <div className="mt-6">
-                {loadingHistory && <p className="text-sm text-zinc-500">Cargando historial...</p>}
+                {loadingHistory && <p className="text-sm text-zinc-500">{t('page.loadingHistory')}</p>}
                 {!loadingHistory && savedStrategies.length === 0 && (
-                  <p className="text-sm text-zinc-500">No hay estrategias guardadas aún.</p>
+                  <p className="text-sm text-zinc-500">{t('page.noSavedStrategies')}</p>
                 )}
                 {savedStrategies.length > 0 && (
                   <div
@@ -404,12 +390,12 @@ export default function Home() {
                       <thead className="sticky top-0 bg-[#050505]">
                         <tr className="border-b border-white/5 text-left text-xs uppercase tracking-[0.2em] text-zinc-500">
                           <th className="px-3 py-2">ID</th>
-                          <th className="px-3 py-2">Nombre</th>
-                          <th className="px-3 py-2">Carrera</th>
-                          <th className="px-3 py-2">Piloto</th>
-                          <th className="px-3 py-2">Stints</th>
-                          <th className="px-3 py-2">Simulado</th>
-                          <th className="px-3 py-2">Creado</th>
+                          <th className="px-3 py-2">{t('page.name')}</th>
+                          <th className="px-3 py-2">{t('page.race')}</th>
+                          <th className="px-3 py-2">{t('page.driver')}</th>
+                          <th className="px-3 py-2">{t('page.stints')}</th>
+                          <th className="px-3 py-2">{t('page.simulated')}</th>
+                          <th className="px-3 py-2">{t('page.created')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -424,7 +410,7 @@ export default function Home() {
                             <td className="px-3 py-2 text-zinc-400">{s.raceId}</td>
                             <td className="px-3 py-2 text-zinc-400">{s.driverId}</td>
                             <td className="px-3 py-2 text-zinc-400">{Array.isArray(s.stints) ? s.stints.length : 0}</td>
-                            <td className="px-3 py-2 text-zinc-400">{s.simulationResult ? "Sí" : "No"}</td>
+                            <td className="px-3 py-2 text-zinc-400">{s.simulationResult ? t('page.yes') : t('page.no')}</td>
                             <td className="px-3 py-2 text-zinc-500">{new Date(s.createdAt).toLocaleString()}</td>
                           </tr>
                         ))}
@@ -434,7 +420,7 @@ export default function Home() {
                               <div className="flex flex-col items-center gap-2">
                                 <div className="h-1 w-12 animate-pulse bg-red-500/40" />
                                 <p className="text-xs uppercase tracking-[0.3em] text-zinc-600">
-                                  {loadingMoreStrategies ? "Cargando más..." : "Desplaza para cargar más"}
+                                  {loadingMoreStrategies ? t('page.loadingMore') : t('page.scrollMore')}
                                 </p>
                               </div>
                             </td>
@@ -446,7 +432,7 @@ export default function Home() {
                 )}
                 {strategyPagination && (
                   <div className="mt-2 text-xs text-zinc-600">
-                    Mostrando {savedStrategies.length} de {strategyPagination.totalItems}
+                    {t('page.showing')} {savedStrategies.length} {t('page.of')} {strategyPagination.totalItems}
                   </div>
                 )}
               </div>
