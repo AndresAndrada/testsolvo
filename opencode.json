@@ -1,0 +1,10 @@
+{
+    "$schema": "https://opencode.dev/schema/agent.json",
+  "mcp": {
+    "chrome-devtools": {
+        "enabled": true,
+        "type": "local",
+        "command": ["npx", "-y", "chrome-devtools-mcp@latest"]
+    }
+  }
+}
