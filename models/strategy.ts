@@ -1,8 +1,8 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "@/config/database";
-import type { CreateStrategyInput } from "@/services/strategySchema";
+import type { StrategyStint } from "@/services/strategySchema";
 
-export type StrategyStint = CreateStrategyInput["stints"][number];
+export type { StrategyStint };
 export type SimulationResult = Record<string, unknown> | null;
 
 export interface StrategyAttributes {

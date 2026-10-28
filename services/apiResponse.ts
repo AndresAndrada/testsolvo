@@ -34,6 +34,8 @@ export function errorResponse(error: unknown): NextResponse {
   if (error instanceof F1ApiError) {
     return fail(error.code, error.message, error.status);
   }
-  console.error("[api] Unhandled error:", error);
+  if (process.env.NODE_ENV === "development") {
+    console.error("[api] Unhandled error:", error);
+  }
   return fail("INTERNAL_ERROR", "An unexpected server error occurred", 500);
 }
