@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useLanguageStore from "@/stores/languageStore";
 
 export interface TyreCompound {
   compound: "SOFT" | "MEDIUM" | "HARD" | "INTERMEDIATE" | "WET";
@@ -22,14 +23,6 @@ interface StrategyBuilderProps {
   onChangeStints: (stints: Stint[]) => void;
 }
 
-const COMPOUND_LABELS: Record<TyreCompound["compound"], string> = {
-  SOFT: "SOFT",
-  MEDIUM: "MEDIUM",
-  HARD: "HARD",
-  INTERMEDIATE: "INTER",
-  WET: "WET",
-};
-
 const COMPOUND_COLORS: Record<TyreCompound["compound"], string> = {
   SOFT: "bg-red-500",
   MEDIUM: "bg-yellow-400",
@@ -42,6 +35,7 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
   const [tyres, setTyres] = useState<TyreCompound[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useLanguageStore();
 
   useEffect(() => {
     const fetchTyres = async () => {
@@ -50,18 +44,18 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
         const res = await fetch("/api/tyres");
         const json = await res.json();
         if (json.error) {
-          setError(json.error.message || "Error al cargar neumáticos");
+          setError(json.error.message || t('strategyBuilder.errorLoading'));
           return;
         }
         setTyres(json.data?.tyres || []);
       } catch (err) {
-        setError("Error al conectar con el servidor");
+        setError(t('strategyBuilder.errorServer'));
       } finally {
         setLoading(false);
       }
     };
     fetchTyres();
-  }, []);
+  }, [t]);
 
   const addStint = () => {
     if (stints.length === 0) {
@@ -123,26 +117,26 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
 
   // Validar si la estrategia es válida
   const validateStrategy = () => {
-    if (stints.length === 0) return { valid: false, errors: ["Sin stints definidos"] };
+    if (stints.length === 0) return { valid: false, errors: [t('strategyBuilder.validation.noStintsDefined')] };
     
     const errors: string[] = [];
     
     // Validar que empiece en vuelta 1
     if (stints[0].fromLap !== 1) {
-      errors.push(`Debe empezar en V1 (actual: V${stints[0].fromLap})`);
+      errors.push(`${t('strategyBuilder.mustStartV1')}${stints[0].fromLap})`);
     }
     
     // Validar que termine en la última vuelta
     const lastStint = stints[stints.length - 1];
     if (lastStint.toLap !== raceLaps) {
-      errors.push(`Debe terminar en V${raceLaps} (actual: V${lastStint.toLap})`);
+      errors.push(`${t('strategyBuilder.mustEndV')}${raceLaps}${t('strategyBuilder.currentV')}${lastStint.toLap})`);
     }
     
     // Validar gaps entre stints
     for (let i = 1; i < stints.length; i++) {
       const expectedFrom = stints[i - 1].toLap + 1;
       if (stints[i].fromLap !== expectedFrom) {
-        errors.push(`Gap detectado: Stint ${i + 1} debe empezar en V${expectedFrom}`);
+        errors.push(`${t('strategyBuilder.gapDetected')}${i + 1}${t('strategyBuilder.mustStartV')}${expectedFrom}`);
       }
     }
     
@@ -152,7 +146,7 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
   const validation = validateStrategy();
 
   if (loading) {
-    return <div className="text-sm text-zinc-400">Cargando compuestos...</div>;
+    return <div className="text-sm text-zinc-400">{t('strategyBuilder.loading')}</div>;
   }
 
   if (error) {
@@ -163,12 +157,12 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
     <div className="space-y-3">
       <div className="rounded-sm border border-blue-500/20 bg-blue-500/5 p-2.5">
         <p className="text-xs text-blue-300/90">
-          <span className="font-medium">ℹ Reglas:</span> La estrategia debe empezar en V1, terminar en V{raceLaps || "?"}, y no tener gaps entre stints.
+          <span className="font-medium">ℹ {t('strategyBuilder.rulesInfo')}{raceLaps || "?"}{t('strategyBuilder.rulesDetail')}</span>
         </p>
       </div>
       
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">Stints</p>
+        <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">{t('strategyBuilder.stints')}</p>
         <div className="flex gap-2">
           <button
             type="button"
@@ -176,7 +170,7 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
             disabled={raceLaps <= 0}
             className="rounded-sm border border-white/10 px-2 py-1 text-xs text-zinc-300 transition hover:border-white/30 disabled:opacity-40"
           >
-            Cubrir carrera
+            {t('strategyBuilder.coverRace')}
           </button>
           <button
             type="button"
@@ -184,14 +178,14 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
             disabled={raceLaps <= 0}
             className="rounded-sm border border-red-500/60 px-2 py-1 text-xs text-red-400 transition hover:bg-red-500/10 disabled:opacity-40"
           >
-            Añadir
+            {t('strategyBuilder.addStint')}
           </button>
         </div>
       </div>
 
       {stints.length === 0 && (
         <div className="rounded-sm border border-white/5 bg-white/[0.01] p-3 text-xs text-zinc-500">
-          Sin stints. Añade uno o cubre toda la carrera.
+          {t('strategyBuilder.noStints')}
         </div>
       )}
 
@@ -201,21 +195,21 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
             <div className={`absolute left-0 top-0 h-full w-1 ${COMPOUND_COLORS[stint.compound]}`} />
             <div className="flex flex-wrap items-end gap-2 p-3 pl-4">
               <div className="flex-1 min-w-[110px]">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Compuesto</p>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">{t('strategyBuilder.tireCompound')}</p>
                 <select
                   value={stint.compound}
                   onChange={(e) => updateStint(index, "compound", e.target.value)}
                   className="mt-1 w-full rounded-sm border border-white/10 bg-black/65 px-2 py-1 text-xs text-zinc-100 focus:border-red-500/60 focus:outline-none"
                 >
-                  {tyres.map((t) => (
-                    <option key={t.compound} value={t.compound}>
-                      {COMPOUND_LABELS[t.compound]}
+                  {tyres.map((tyre) => (
+                    <option key={tyre.compound} value={tyre.compound}>
+                      {t(`strategyBuilder.tireCompounds.${tyre.compound}`)}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="w-20">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Desde</p>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">{t('strategyBuilder.fromLap')}</p>
                 <input
                   type="number"
                   min={index === 0 ? 1 : stints[index - 1].toLap + 1}
@@ -228,7 +222,7 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
                 />
               </div>
               <div className="w-20">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Hasta</p>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">{t('strategyBuilder.toLap')}</p>
                 <input
                   type="number"
                   min={stint.fromLap}
@@ -243,7 +237,7 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
                 onClick={() => removeStint(index)}
                 className="mb-0.5 rounded-sm px-2 py-1 text-xs text-zinc-500 transition hover:text-red-400"
               >
-                Quitar
+                {t('strategyBuilder.removeStint')}
               </button>
             </div>
           </div>
@@ -253,11 +247,11 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
       {stints.length > 0 && raceLaps > 0 && (
         <div className="space-y-2">
           <div className="text-xs text-zinc-500">
-            Cobertura: V{stints[0].fromLap} – V{stints[stints.length - 1].toLap} / {raceLaps}
+            {t('strategyBuilder.coverage')}: {t('resultsView.lapShort')}{stints[0].fromLap} – {t('resultsView.lapShort')}{stints[stints.length - 1].toLap} / {raceLaps}
           </div>
           {!validation.valid && (
              <div className="rounded-sm border border-yellow-500/40 bg-yellow-500/10 p-3 space-y-2">
-               <p className="text-xs font-medium text-yellow-400">⚠ Errores de validación:</p>
+               <p className="text-xs font-medium text-yellow-400">⚠ {t('strategyBuilder.validationErrors')}</p>
                {validation.errors.map((error, idx) => (
                  <p key={idx} className="text-xs text-yellow-300/80">• {error}</p>
                ))}
@@ -266,13 +260,13 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
                  onClick={autoFixStrategy}
                  className="mt-2 w-full rounded-sm border border-yellow-400/40 bg-yellow-400/10 px-3 py-1.5 text-xs font-medium text-yellow-300 transition hover:bg-yellow-400/20"
                >
-                 ✓ Corregir automáticamente
+                 ✓ {t('strategyBuilder.autoFix')}
                </button>
              </div>
            )}
           {validation.valid && (
             <div className="rounded-sm border border-emerald-500/40 bg-emerald-500/10 p-2">
-              <p className="text-xs text-emerald-400">✓ Estrategia válida</p>
+              <p className="text-xs text-emerald-400">✓ {t('strategyBuilder.validStrategy')}</p>
             </div>
           )}
         </div>

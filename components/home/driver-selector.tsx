@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useLanguageStore from "@/stores/languageStore";
 
 export interface Driver {
   id: string;
@@ -27,6 +28,7 @@ export default function DriverSelector({ selectedDriverId, onSelectDriver }: Dri
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useLanguageStore();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,31 +43,31 @@ export default function DriverSelector({ selectedDriverId, onSelectDriver }: Dri
         const teamsJson = await teamsRes.json();
 
         if (driversJson.error) {
-          setError(driversJson.error.message || "Error al cargar pilotos");
+          setError(driversJson.error.message || t('driverSelector.errorDrivers'));
           return;
         }
         if (teamsJson.error) {
-          setError(teamsJson.error.message || "Error al cargar equipos");
+          setError(teamsJson.error.message || t('driverSelector.errorTeams'));
           return;
         }
 
         setDrivers(driversJson.data?.drivers || []);
         setTeams(teamsJson.data?.teams || []);
       } catch (err) {
-        setError("Error al conectar con el servidor");
+        setError(t('driverSelector.errorServer'));
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [t]);
 
   const getTeamName = (teamId: string) => {
     return teams.find((t) => t.id === teamId)?.name || teamId;
   };
 
   if (loading) {
-    return <div className="text-sm text-zinc-400">Cargando parrilla...</div>;
+    return <div className="text-sm text-zinc-400">{t('driverSelector.loading')}</div>;
   }
 
   if (error) {
@@ -78,7 +80,7 @@ export default function DriverSelector({ selectedDriverId, onSelectDriver }: Dri
   return (
     <div className="space-y-2">
       <label htmlFor="driver" className="text-xs uppercase tracking-[0.25em] text-zinc-500">
-        Piloto
+        {t('driverSelector.selectDriver')}
       </label>
       <select
         id="driver"
@@ -86,7 +88,7 @@ export default function DriverSelector({ selectedDriverId, onSelectDriver }: Dri
         onChange={(e) => onSelectDriver(e.target.value)}
         className="mt-1 w-full rounded-sm border border-white/10 bg-black/65 px-3 py-2 text-sm text-zinc-100 shadow-[0_20px_60px_-40px_rgba(239,68,68,0.8)] transition focus:border-red-500/60 focus:outline-none focus:ring-0"
       >
-        <option value="">Seleccionar piloto</option>
+        <option value="">{t('driverSelector.selectDriverPlaceholder')}</option>
         {drivers.map((driver) => (
           <option key={driver.id} value={driver.id}>
             #{driver.number} · {driver.name} · {getTeamName(driver.teamId)}
@@ -96,15 +98,15 @@ export default function DriverSelector({ selectedDriverId, onSelectDriver }: Dri
       {selectedDriver && (
         <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-zinc-400">
           <div className="rounded-sm border border-white/5 px-2 py-1">
-            <span className="text-zinc-500">Ritmo</span>
+            <span className="text-zinc-500">{t('driverSelector.pace')}</span>
             <div className="text-zinc-200">{(selectedDriver.pace * 100).toFixed(0)}%</div>
           </div>
           <div className="rounded-sm border border-white/5 px-2 py-1">
-            <span className="text-zinc-500">Consistencia</span>
+            <span className="text-zinc-500">{t('driverSelector.consistency')}</span>
             <div className="text-zinc-200">{(selectedDriver.consistency * 100).toFixed(0)}%</div>
           </div>
           <div className="rounded-sm border border-white/5 px-2 py-1">
-            <span className="text-zinc-500">Coche</span>
+            <span className="text-zinc-500">{t('driverSelector.car')}</span>
             <div className="text-zinc-200">{selectedTeam ? `${(selectedTeam.carPerformance * 100).toFixed(0)}%` : "-"}</div>
           </div>
         </div>
