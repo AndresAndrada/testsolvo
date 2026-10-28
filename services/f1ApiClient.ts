@@ -33,6 +33,21 @@ export interface TyreCompound {
   optimalRainIntensity: { min: number; max: number };
 }
 
+export interface Driver {
+  id: string;
+  name: string;
+  number: number;
+  teamId: string;
+  pace: number;
+  consistency: number;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  carPerformance: number;
+}
+
 export class F1ApiError extends Error {
   constructor(
     public readonly code: string,
@@ -144,6 +159,20 @@ export async function getTyres(): Promise<TyreCompound[]> {
   return cached("tyres", 60 * MINUTE_MS, async () => {
     const data = await request<{ tyres: TyreCompound[] }>("/api/tyres");
     return data.tyres;
+  });
+}
+
+export async function getDrivers(): Promise<Driver[]> {
+  return cached("drivers", 60 * MINUTE_MS, async () => {
+    const data = await request<{ drivers: Driver[] }>("/api/drivers");
+    return data.drivers;
+  });
+}
+
+export async function getTeams(): Promise<Team[]> {
+  return cached("teams", 60 * MINUTE_MS, async () => {
+    const data = await request<{ teams: Team[] }>("/api/teams");
+    return data.teams;
   });
 }
 
