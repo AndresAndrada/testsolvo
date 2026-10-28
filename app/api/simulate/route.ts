@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
   const bodyObj = body as Record<string, unknown>;
   const limit = typeof bodyObj.limit === "number" && bodyObj.limit > 0 ? Math.min(bodyObj.limit, 100) : 20;
   const offset = typeof bodyObj.offset === "number" && bodyObj.offset >= 0 ? bodyObj.offset : 0;
-
+  
   try {
     const [race, drivers, tyres] = await Promise.all([
       getRaceById(raceId),

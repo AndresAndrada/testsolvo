@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import RaceSelector from "@/components/race-selector";
-import DriverSelector from "@/components/driver-selector";
-import StrategyBuilder, { type Stint } from "@/components/strategy-builder";
-import ResultsView, { type SimulationResult } from "@/components/results-view";
+import RaceSelector from "@/components/home/race-selector";
+import DriverSelector from "@/components/home/driver-selector";
+import StrategyBuilder, { type Stint } from "@/components/home/strategy-builder";
+import ResultsView, { type SimulationResult } from "@/components/home/results-view";
 
 export default function Home() {
   const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);

@@ -78,7 +78,6 @@ export default function ResultsView({ result }: ResultsViewProps) {
     const originalStints = (result as any).__originalStints;
     
     if (!raceId || !driverId || !originalStints) {
-      console.warn("Missing required data for pagination:", { raceId, driverId, originalStints });
       return;
     }
 
@@ -98,7 +97,6 @@ export default function ResultsView({ result }: ResultsViewProps) {
       const json = await res.json();
       
       if (json.error) {
-        console.error("Error loading more laps:", json.error);
         return;
       }
       
@@ -111,8 +109,7 @@ export default function ResultsView({ result }: ResultsViewProps) {
       if (nextPagination) {
         setPagination(nextPagination);
       }
-    } catch (error) {
-      console.error("Failed to load more laps:", error);
+    } catch {
     } finally {
       setLoadingMore(false);
     }

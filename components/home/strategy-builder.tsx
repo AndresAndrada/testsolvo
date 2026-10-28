@@ -247,7 +247,7 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
               </button>
             </div>
           </div>
-        ))}Acá deberia devolver 15 
+        ))}
       </div>
 
       {stints.length > 0 && raceLaps > 0 && (
