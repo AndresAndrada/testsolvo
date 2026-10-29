@@ -168,7 +168,7 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
             type="button"
             onClick={autoFillStrategy}
             disabled={raceLaps <= 0}
-            className="rounded-sm border border-white/10 px-2 py-1 text-xs text-zinc-300 transition hover:border-white/30 disabled:opacity-40"
+            className="rounded-sm border border-white/10 px-2 py-1 text-xs text-zinc-300 transition hover:border-white/30 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {t('strategyBuilder.coverRace')}
           </button>
@@ -176,7 +176,7 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
             type="button"
             onClick={addStint}
             disabled={raceLaps <= 0}
-            className="rounded-sm border border-red-500/60 px-2 py-1 text-xs text-red-400 transition hover:bg-red-500/10 disabled:opacity-40"
+            className="rounded-sm border border-red-500/60 px-2 py-1 text-xs text-red-400 transition hover:bg-red-500/10 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {t('strategyBuilder.addStint')}
           </button>
@@ -235,7 +235,7 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
               <button
                 type="button"
                 onClick={() => removeStint(index)}
-                className="mb-0.5 rounded-sm px-2 py-1 text-xs text-zinc-500 transition hover:text-red-400"
+                className="mb-0.5 rounded-sm px-2 py-1 text-xs text-zinc-500 transition hover:text-red-400 cursor-pointer disabled:cursor-not-allowed"
               >
                 {t('strategyBuilder.removeStint')}
               </button>
@@ -258,7 +258,7 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
                <button
                  type="button"
                  onClick={autoFixStrategy}
-                 className="mt-2 w-full rounded-sm border border-yellow-400/40 bg-yellow-400/10 px-3 py-1.5 text-xs font-medium text-yellow-300 transition hover:bg-yellow-400/20"
+                 className="mt-2 w-full rounded-sm border border-yellow-400/40 bg-yellow-400/10 px-3 py-1.5 text-xs font-medium text-yellow-300 transition hover:bg-yellow-400/20 cursor-pointer"
                >
                  ✓ {t('strategyBuilder.autoFix')}
                </button>
