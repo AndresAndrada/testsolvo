@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import useLanguageStore from "@/stores/languageStore";
+import { Input, Select, Button } from "@/components/ui";
 
 export interface TyreCompound {
   compound: "SOFT" | "MEDIUM" | "HARD" | "INTERMEDIATE" | "WET";
@@ -164,22 +165,22 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
       <div className="flex items-center justify-between">
         <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">{t('strategyBuilder.stints')}</p>
         <div className="flex gap-2">
-          <button
+          <Button
             type="button"
             onClick={autoFillStrategy}
             disabled={raceLaps <= 0}
-            className="rounded-sm border border-white/10 px-2 py-1 text-xs text-zinc-300 transition hover:border-white/30 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            variant="secondary"
           >
             {t('strategyBuilder.coverRace')}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={addStint}
             disabled={raceLaps <= 0}
-            className="rounded-sm border border-red-500/60 px-2 py-1 text-xs text-red-400 transition hover:bg-red-500/10 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            variant="primary"
           >
             {t('strategyBuilder.addStint')}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -196,49 +197,50 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
             <div className="flex flex-wrap items-end gap-2 p-3 pl-4">
               <div className="flex-1 min-w-[110px]">
                 <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">{t('strategyBuilder.tireCompound')}</p>
-                <select
+                <Select
                   value={stint.compound}
                   onChange={(e) => updateStint(index, "compound", e.target.value)}
-                  className="mt-1 w-full rounded-sm border border-white/10 bg-black/65 px-2 py-1 text-xs text-zinc-100 focus:border-red-500/60 focus:outline-none"
+                  className="mt-1"
                 >
                   {tyres.map((tyre) => (
                     <option key={tyre.compound} value={tyre.compound}>
                       {t(`strategyBuilder.tireCompounds.${tyre.compound}`)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
               <div className="w-20">
                 <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">{t('strategyBuilder.fromLap')}</p>
-                <input
+                <Input
                   type="number"
                   min={index === 0 ? 1 : stints[index - 1].toLap + 1}
                   max={stint.toLap}
                   value={stint.fromLap}
                   onChange={(e) => updateStint(index, "fromLap", parseInt(e.target.value) || 1)}
                   disabled={index > 0}
-                  className="mt-1 w-full rounded-sm border border-white/10 bg-transparent px-2 py-1 text-xs text-zinc-100 focus:border-red-500/60 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mt-1 w-full"
                   title={index > 0 ? "El inicio se ajusta automáticamente" : ""}
                 />
               </div>
               <div className="w-20">
                 <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">{t('strategyBuilder.toLap')}</p>
-                <input
+                <Input
                   type="number"
                   min={stint.fromLap}
                   max={index === stints.length - 1 ? raceLaps : raceLaps}
                   value={stint.toLap}
                   onChange={(e) => updateStint(index, "toLap", parseInt(e.target.value) || stint.fromLap)}
-                  className="mt-1 w-full rounded-sm border border-white/10 bg-transparent px-2 py-1 text-xs text-zinc-100 focus:border-red-500/60 focus:outline-none"
+                  className="mt-1 w-full"
                 />
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={() => removeStint(index)}
-                className="mb-0.5 rounded-sm px-2 py-1 text-xs text-zinc-500 transition hover:text-red-400 cursor-pointer disabled:cursor-not-allowed"
+                variant="ghost"
+                className="mb-0.5"
               >
                 {t('strategyBuilder.removeStint')}
-              </button>
+              </Button>
             </div>
           </div>
         ))}
@@ -255,13 +257,14 @@ export default function StrategyBuilder({ raceLaps, stints, onChangeStints }: St
                {validation.errors.map((error, idx) => (
                  <p key={idx} className="text-xs text-yellow-300/80">• {error}</p>
                ))}
-               <button
+               <Button
                  type="button"
                  onClick={autoFixStrategy}
-                 className="mt-2 w-full rounded-sm border border-yellow-400/40 bg-yellow-400/10 px-3 py-1.5 text-xs font-medium text-yellow-300 transition hover:bg-yellow-400/20 cursor-pointer"
+                 variant="warning"
+                 className="mt-2 w-full"
                >
                  ✓ {t('strategyBuilder.autoFix')}
-               </button>
+               </Button>
              </div>
            )}
           {validation.valid && (

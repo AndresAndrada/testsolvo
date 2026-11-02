@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import useLanguageStore from "@/stores/languageStore";
+import { Select } from "@/components/ui";
 
 export interface Driver {
   id: string;
@@ -82,11 +83,10 @@ export default function DriverSelector({ selectedDriverId, onSelectDriver }: Dri
       <label htmlFor="driver" className="text-xs uppercase tracking-[0.25em] text-zinc-500">
         {t('driverSelector.selectDriver')}
       </label>
-      <select
+      <Select
         id="driver"
         value={selectedDriverId || ""}
         onChange={(e) => onSelectDriver(e.target.value)}
-        className="mt-1 w-full rounded-sm border border-white/10 bg-black/65 px-3 py-2 text-sm text-zinc-100 shadow-[0_20px_60px_-40px_rgba(239,68,68,0.8)] transition focus:border-red-500/60 focus:outline-none focus:ring-0"
       >
         <option value="">{t('driverSelector.selectDriverPlaceholder')}</option>
         {drivers.map((driver) => (
@@ -94,7 +94,7 @@ export default function DriverSelector({ selectedDriverId, onSelectDriver }: Dri
             #{driver.number} · {driver.name} · {getTeamName(driver.teamId)}
           </option>
         ))}
-      </select>
+      </Select>
       {selectedDriver && (
         <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-zinc-400">
           <div className="rounded-sm border border-white/5 px-2 py-1">

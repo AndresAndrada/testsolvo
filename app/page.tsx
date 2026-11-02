@@ -71,8 +71,14 @@ export default function Home() {
         }),
       });
       const createJson = await createRes.json();
+      console.log("[handleSaveAndSimulate] createJson:", createJson);
       if (createJson.error) {
-        setError(createJson.error.message || t('page.errorSavingStrategy'));
+        const errorMsg =
+          createJson.error?.message ||
+          (typeof createJson.error === "string" ? createJson.error : null) ||
+          createJson.message ||
+          t('page.errorSavingStrategy');
+        setError(errorMsg);
         setLoading(false);
         return;
       }
@@ -94,8 +100,14 @@ export default function Home() {
         }),
       });
       const simJson = await simRes.json();
+      console.log("[handleSaveAndSimulate] simJson:", simJson);
       if (simJson.error) {
-        setError(simJson.error.message || t('page.errorSimulation'));
+        const errorMsg =
+          simJson.error?.message ||
+          (typeof simJson.error === "string" ? simJson.error : null) ||
+          simJson.message ||
+          t('page.errorSimulation');
+        setError(errorMsg);
         setLoading(false);
         return;
       }
@@ -109,7 +121,8 @@ export default function Home() {
         (simulationData as any).__originalStints = stints;
       }
       setResult(simulationData);
-    } catch {
+    } catch (err) {
+      console.error("[handleSaveAndSimulate] error:", err);
       setError(t('page.errorConnectingServer'));
     } finally {
       setLoading(false);

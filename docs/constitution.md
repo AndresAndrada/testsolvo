@@ -8,3 +8,4 @@ Non-negotiable principles. Every aspect, plan, and task must adhere to these.
 4. **Design principles**: The code must follow sound design and architectural principles.
 5. **SOLID principles**: The code must adhere to SOLID principles to ensure maintainability and extensibility.
 6. **Language**: The code must be in English and Spanish.
+7. **The spec is the truth**: Nothing is implemented unless it is part of the active spec. If a decision is missing, the process is halted and a clarification is requested.

@@ -1,85 +1,82 @@
-# Sistema de Internacionalización (i18n) - F1 Race Strategist
+# Internationalization (i18n) System - F1 Race Strategist
 
-## 📁 Estructura de Archivos Creados
+## 📁 File Structure
 
 ```
 testsolvo/
 ├── locales/
-│   ├── es.json          # Traducciones en español
-│   └── en.json          # Traducciones en inglés
+│   ├── es.json          # Spanish translations
+│   └── en.json          # English translations
 ├── contexts/
-│   └── LanguageContext.tsx  # Context API para gestión de idioma
+│   └── LanguageContext.tsx  # Context API for language management
 ├── components/
 │   └── ui/
-│       ├── language-modal.tsx   # Modal para cambiar idioma
-│       └── language-toggle.tsx  # Botón flotante de cambio de idioma
+│       ├── language-modal.tsx   # Modal for changing language
+│       └── language-toggle.tsx  # Floating button for language switching
 ├── app/
-│   ├── layout.tsx       # Actualizado con LanguageProvider
-│   └── page.tsx         # Actualizado con LanguageToggle
+│   ├── layout.tsx       # Updated with LanguageProvider
+│   └── page.tsx         # Updated with LanguageToggle
 ```
 
-## ✅ Sistema Implementado
+## ✅ Implemented System
 
-### 1. **Archivos de Traducción**
-- ✅ `locales/es.json` - Traducciones en español (idioma por defecto)
-- ✅ `locales/en.json` - Traducciones en inglés
+### 1. **Translation Files**
+- ✅ `locales/es.json` - Spanish translations (default language)
+- ✅ `locales/en.json` - English translations
 
-**Categorías de traducción incluidas:**
-- `common` - Elementos comunes (loading, error, save, cancel, etc.)
-- `language` - Modal de idioma
-- `navigation` - Tabs de navegación
-- `raceSelector` - Selector de carrera
-- `driverSelector` - Selector de piloto
-- `strategyBuilder` - Constructor de estrategia
-- `resultsView` - Vista de resultados
-- `savedStrategies` - Estrategias guardadas
-- `app` - Títulos y mensajes de la aplicación
+**Included translation categories:**
+- `common` - Common elements (loading, error, save, cancel, etc.)
+- `language` - Language modal
+- `navigation` - Navigation tabs
+- `raceSelector` - Race selector
+- `driverSelector` - Driver selector
+- `strategyBuilder` - Strategy builder
+- `resultsView` - Results view
+- `savedStrategies` - Saved strategies
+- `app` - Application titles and messages
 
-### 2. **Context de Idioma**
-✅ `contexts/LanguageContext.tsx`
+**Features:**
+- Type-safe with TypeScript (`Language = 'es' | 'en'`)
+- Persistence in `localStorage` using the key `f1-strategist-language`
+- Default language: **Spanish (es)**
+- `t(key: string)` function for translation, with support for dot notation (e.g., `t('raceSelector.title')`)
+- Custom `useLanguage()` hook for use within components
 
-**Características:**
-- Type-safe con TypeScript (`Language = 'es' | 'en'`)
-- Persistencia en `localStorage` con clave `f1-strategist-language`
-- Idioma por defecto: **Español (es)**
-- Función `t(key: string)` para traducir con soporte de notación de punto (ej: `t('raceSelector.title')`)
-- Hook personalizado `useLanguage()` para usar en componentes
-
-### 3. **Componentes UI**
+### 3. **UI Components**
 
 #### **LanguageModal** (`components/ui/language-modal.tsx`)
-✅ Modal elegante con:
-- Backdrop blur y animaciones fade-in/scale-in
-- Dos opciones de idioma con banderas (🇪🇸 Español / 🇬🇧 English)
-- Indicador visual del idioma seleccionado (checkmark azul)
-- Botón de cerrar (X) en la esquina superior derecha
-- Diseño responsive con modo oscuro
+✅ Elegant modal featuring:
+- Backdrop blur and fade-in/scale-in animations
+- Two language options with flags (🇪🇸 Spanish / 🇬🇧 English)
+- Visual indicator for the selected language (blue checkmark)
+- Close button (X) in the top-right corner
+- Responsive design with dark mode support
 
 #### **LanguageToggle** (`components/ui/language-toggle.tsx`)
-✅ Botón flotante con:
-- Posición fija en la esquina superior derecha (`top-4 right-4`)
-- Muestra bandera y código del idioma actual
-- Hover effect con scale
-- Abre el modal al hacer click
-- z-index 40 para estar sobre otros elementos
+✅ Floating button featuring:
+- Fixed positioning in the top-right corner (`top-4 right-4`)
+- Displays the current language's flag and code
+- Hover effect with scaling
+- Opens the modal upon clicking
+- `z-index: 40` to ensure it sits above other elements
 
-### 4. **Integración**
+### 4. **Integration**
 
-✅ **Layout actualizado** (`app/layout.tsx`):
+✅ **Updated Layout** (`app/layout.tsx`):
 ```tsx
 <LanguageProvider>
   {children}
 </LanguageProvider>
 ```
 
-✅ **Página principal** (`app/page.tsx`):
+✅ **Main Page** (`app/page.tsx`):
 ```tsx
 <LanguageToggle />
 ```
 
-## 🚀 Cómo Usar el Sistema de i18n en Componentes
+## 🚀 How to Use the i18n System in Components
 
-### Ejemplo Básico
+### Basic Example
 
 ```tsx
 'use client';
@@ -88,32 +85,29 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 export function MyComponent() {
   const { t, language } = useLanguage();
-
-  return (
+``` return (
     <div>
       <h1>{t('app.title')}</h1>
       <p>{t('raceSelector.selectRace')}</p>
       <button>{t('common.save')}</button>
       
-      {/* Idioma actual */}
+      {/* Current language */}
       <p>Current language: {language}</p>
     </div>
   );
 }
 ```
-
-### Ejemplo con Claves Anidadas
+### Example with Nested Keys
 
 ```tsx
 const { t } = useLanguage();
 
-// Acceso con notación de punto
+// Access using dot notation
 t('strategyBuilder.tireCompounds.soft')     // "Blando" (es) / "Soft" (en)
-t('strategyBuilder.validation.selectRace')  // "Debes seleccionar una carrera" (es)
+t('strategyBuilder.validation.selectRace')  // "You must select a race" (es)
 t('savedStrategies.table.name')             // "Nombre" (es) / "Name" (en)
-```
 
-### Ejemplo de Cambio Programático de Idioma
+### Example of Programmatic Language Change
 
 ```tsx
 const { setLanguage } = useLanguage();
@@ -127,22 +121,22 @@ const handleChangeToSpanish = () => {
 };
 ```
 
-## 🎨 Diseño Visual
+## 🎨 Visual Design
 
-### Botón de Idioma (LanguageToggle)
+### Language Button (LanguageToggle)
 ```
 ┌─────────────────┐
-│ 🇪🇸 ES    ▼    │  ← Botón flotante (fixed top-right)
+│ 🇪🇸 ES    ▼    │  ← Floating button (fixed top-right)
 └─────────────────┘
 ```
 
-### Modal de Idioma (LanguageModal)
+### Language Modal (LanguageModal)
 ```
 ┌──────────────────────────────────┐
-│  Cambiar Idioma              [X] │
+│  Change Language             [X] │
 ├──────────────────────────────────┤
 │  ┌────────────────────────────┐  │
-│  │ 🇪🇸 Español            ✓  │  │ ← Seleccionado
+│  │ 🇪🇸 Español            ✓  │  │ ← Selected
 │  └────────────────────────────┘  │
 │  ┌────────────────────────────┐  │
 │  │ 🇬🇧 English               │  │
@@ -150,57 +144,57 @@ const handleChangeToSpanish = () => {
 └──────────────────────────────────┘
 ```
 
-## 📊 Estructura de Traducciones
+## 📊 Translation Structure
 
-### Español (es.json) - 139 líneas
-- 138 claves de traducción
-- Terminología F1 en español
+### Español (es.json) - 139 lines
+- 138 translation keys
+- F1 terminology in Spanish
 
-### Inglés (en.json) - 139 líneas
-- 138 claves de traducción
-- Terminología F1 en inglés (estándar internacional)
+### English (en.json) - 139 lines
+- 138 translation keys
+- F1 terminology in English (international standard)
 
-## ✨ Características Destacadas
+## ✨ Key Features
 
-1. **Persistencia**: El idioma seleccionado se guarda en localStorage
-2. **Type-Safe**: TypeScript garantiza tipos correctos
-3. **SSR Compatible**: Manejo de hydration con Next.js 16
-4. **Accesible**: Labels ARIA y navegación por teclado
-5. **Responsive**: Diseño adaptable a móviles y desktop
-6. **Animaciones**: Transiciones suaves y modernas
-7. **Dark Mode**: Soporte completo para modo oscuro
+1. **Persistence**: The selected language is saved in `localStorage`
+2. **Type-Safe**: TypeScript ensures correct typing
+3. **SSR Compatible**: Hydration handling with Next.js 16
+4. **Accessible**: ARIA labels and keyboard navigation
+5. **Responsive**: Design that adapts to mobile and desktop
+6. **Animations**: Smooth, modern transitions
+7. **Dark Mode**: Full support for dark mode
 
-## 🔧 Testing del Sistema
+## 🔧 System Testing
 
-Para verificar el funcionamiento:
+To verify functionality:
 
-1. Iniciar el servidor de desarrollo:
+1. Start the development server:
 ```bash
 npm run dev
 ```
 
-2. Abrir http://localhost:3000
+2. Open http://localhost:3000
 
-3. Hacer click en el botón flotante (🇪🇸 ES) en la esquina superior derecha
+3. Click the floating button (🇪🇸 ES) in the top-right corner
 
-4. Seleccionar "English" en el modal
+4. Select "English" from the modal
 
-5. Verificar que el idioma cambia y persiste al recargar la página
+5. Confirm that the language changes and persists upon page reload
 
-## 📝 Próximos Pasos para Integración Completa
+## 📝 Next Steps for Full Integration
 
-Para usar las traducciones en los componentes existentes:
+To use the translations within existing components:
 
-1. **RaceSelector** → Reemplazar textos hardcodeados con `t('raceSelector.*')`
-2. **DriverSelector** → Reemplazar textos hardcodeados con `t('driverSelector.*')`
-3. **StrategyBuilder** → Reemplazar textos hardcodeados con `t('strategyBuilder.*')`
-4. **ResultsView** → Reemplazar textos hardcodeados con `t('resultsView.*')`
-5. **NavigationTabs** → Reemplazar textos hardcodeados con `t('navigation.*')`
-6. **SavedStrategies** → Reemplazar textos hardcodeados con `t('savedStrategies.*')`
+1. **RaceSelector** → Replace hardcoded text with `t('raceSelector.*')`
+2. **DriverSelector** → Replace hardcoded text with `t('driverSelector.*')`
+3. **StrategyBuilder** → Replace hardcoded text with `t('strategyBuilder.*')`
+4. **ResultsView** → Replace hardcoded text with `t('resultsView.*')`
+5. **NavigationTabs** → Replace hardcoded text with `t('navigation.*')`
+6. **SavedStrategies** → Replace hardcoded text with `t('savedStrategies.*')`
 
-## ✅ Build Verificado
+## ✅ Verified Build
 
-El proyecto compila exitosamente sin errores:
+The project compiles successfully without errors:
 ```
 ✓ Compiled successfully in 16.8s
 ✓ Running TypeScript in 9.9s
@@ -209,4 +203,4 @@ El proyecto compila exitosamente sin errores:
 
 ---
 
-**Sistema completado y listo para uso** 🏎️🏁
+**System completed and ready for use** 🏎️🏁
