@@ -9,6 +9,7 @@ import NavigationTabs from "@/components/ui/navigation-tabs";
 import Navbar from "@/components/navBar/navbar";
 import SavedStrategiesView from "@/components/home/saved-strategies-view";
 import useLanguageStore from "@/stores/languageStore";
+import NewSimulation from "@/components/home/new-simulation";
 
 export default function Home() {
   const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
@@ -34,6 +35,7 @@ export default function Home() {
     try {
       const res = await fetch(`/api/races/${raceId}`);
       const json = await res.json();
+      console.log("🚀 ~ handleRaceSelect ~ json:", json)
       if (json.error) {
         setError(json.error.message || t('page.errorLoadingRace'));
         return;
@@ -179,6 +181,31 @@ export default function Home() {
         <NavigationTabs activeTab={activeTab} onTabChange={setActiveTab} />
         {activeTab === "nueva" && (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[380px_1fr]">
+            <NewSimulation 
+              setRaceLaps={setRaceLaps}
+              onSimulate={handleSimulate}
+              handleSaveAndSimulate={handleSaveAndSimulate}
+              t={t}
+              selectedRaceId={selectedRaceId}
+              onSelectRace={(raceId: string | null) => { 
+                if (raceId !== null) {
+                  handleRaceSelect(raceId);
+                } else {
+                  setSelectedRaceId(null);
+                  setRaceLaps(0);
+                }
+              }}
+              selectedDriverId={selectedDriverId}
+              onSelectDriver={setSelectedDriverId} 
+              setStrategyName={(name: string | null) => setStrategyName(name || '')}
+              raceLaps={raceLaps}
+              strategyName={strategyName}
+              stints={stints}
+              setStints={(newStints: Stint[] | null) => setStints(newStints || [] as Stint[])}
+              loading={loading}
+              error={error}
+              result={result}
+            />
             <div className="space-y-6">
               <section className="relative overflow-hidden rounded-sm border border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent shadow-[0_40px_80px_-60px_rgba(239,68,68,0.6)]">
                 <div className="absolute -top-24 right-0 h-48 w-48 rounded-full bg-red-600/10 blur-3xl" />
