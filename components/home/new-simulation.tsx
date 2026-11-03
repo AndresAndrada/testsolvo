@@ -1,27 +1,29 @@
 import DriverSelector from "./driver-selector";
 import RaceSelector from "./race-selector";
 import StrategyBuilder, { type Stint } from "@/components/home/strategy-builder";
-import { type SimulationResult } from "@/components/home/results-view";
+import { type SimulationResult } from "@/types";
+
+type PropsNewSimulation = {
+    t: (key: string) => string; 
+    selectedRaceId: string | null;
+    onSimulate: () => void;
+    handleSaveAndSimulate: () => void;
+     onSelectRace: (raceId: string | null) => void;
+      selectedDriverId: string | null;
+       onSelectDriver: (driverId: string | null) => void 
+    strategyName: string | null;
+    setStrategyName: (name: string | null) => void;
+    raceLaps: number;
+    setRaceLaps: (laps: number) => void;
+    stints: Stint[] | null;
+    setStints: (stints: Stint[] | null) => void;
+    loading: boolean;
+    error: string | null;
+    result: SimulationResult | null;
+}
 
 export default function NewSimulation(
-    { t, onSimulate, handleSaveAndSimulate, selectedRaceId, onSelectRace, selectedDriverId, onSelectDriver, raceLaps, strategyName, setStrategyName, stints, setStints, loading, error, result }: { 
-        t: (key: string) => string; 
-        selectedRaceId: string | null;
-        onSimulate: () => void;
-        handleSaveAndSimulate: () => void;
-         onSelectRace: (raceId: string | null) => void;
-          selectedDriverId: string | null;
-           onSelectDriver: (driverId: string | null) => void 
-        strategyName: string | null;
-        setStrategyName: (name: string | null) => void;
-        raceLaps: number;
-        setRaceLaps: (laps: number) => void;
-        stints: Stint[] | null;
-        setStints: (stints: Stint[] | null) => void;
-        loading: boolean;
-        error: string | null;
-        result: SimulationResult | null;
-        }) {
+    { t, onSimulate, handleSaveAndSimulate, selectedRaceId, onSelectRace, selectedDriverId, onSelectDriver, raceLaps, strategyName, setStrategyName, stints, setStints, loading, error, result }: PropsNewSimulation) {
   return (
    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[380px_1fr]">
                <div className="space-y-6">
