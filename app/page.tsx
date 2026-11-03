@@ -9,6 +9,7 @@ import Navbar from "@/components/navBar/navbar";
 import SavedStrategiesView from "@/components/home/saved-strategies-view";
 import useLanguageStore from "@/stores/languageStore";
 import NewSimulation from "@/components/home/new-simulation";
+import { useRaces } from "@/hooks/useRaces";
 
 export default function Home() {
   const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
@@ -33,6 +34,7 @@ export default function Home() {
     }
     try {
       const res = await fetch(`/api/races/${raceId}`);
+      // const res = await useRaces();
       const json = await res.json();
       if (json.error) {
         setError(json.error.message || t('page.errorLoadingRace'));
