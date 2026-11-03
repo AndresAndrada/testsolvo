@@ -33,7 +33,7 @@ export function LanguageToggle() {
 
       {/* English Flag */}
       <span className={`text-2xl transition-opacity ${language === 'en' ? 'opacity-100' : 'opacity-40'}`}>
-        🇬🇧
+        🇺🇸
       </span>
     </div>
   );

@@ -1,14 +1,14 @@
 ---
 name: Plannificator
-description: Define el plan de tareas detallado y los hitos incrementales para construir la aplicación en tiempo récord.
+description: Defines a detailed task plan and incremental milestones to build the application in record time.
 mode: subagent
 ---
 
-# Plan de Desarrollo: F1 Race Strategist
+# Development Plan: F1 Race Strategist
 
-- [ ] **Fase 1:** Inicialización del proyecto Next.js + Configuración de PostgreSQL y Sequelize.
-- [ ] **Fase 2:** Capa de servicios para consumir la API externa (`https://tech-challenge101.onrender.com`) con manejo de caché o reintentos por tiempo de respuesta (cold start).
-- [ ] **Fase 3:** Desarrollo del motor de simulación matemática (cálculo de desgaste de neumáticos, pérdida en pits, clima y vueltas totales).
-- [ ] **Fase 4:** Creación de endpoints Backend en Next.js (`/api/races`, `/api/simulate`).
-- [ ] **Fase 5:** Desarrollo del Frontend (Selector de carreras, constructor interactivo de stints/neumáticos, visualizador de resultados desglosados).
-- [ ] **Fase 6:** Pruebas finales, redacción del README con asunciones y preparación para la entrevista.
+- [ ] **Phase 1:** Next.js project initialization + PostgreSQL and Sequelize configuration.
+- [ ] **Phase 2:** Service layer to consume the external API (`https://tech-challenge101.onrender.com`), including cache management or retry logic to handle response latency (cold starts).
+- [ ] **Phase 3:** Development of the mathematical simulation engine (calculating tire wear, pit stop time loss, weather conditions, and total laps).
+- [ ] **Phase 4:** Creation of backend endpoints in Next.js (`/api/races`, `/api/simulate`).
+- [ ] **Phase 5:** Frontend development (race selector, interactive stint/tire builder, and detailed results visualization).
+- [ ] **Phase 6:** Final testing, drafting the README (including key assumptions), and preparation for the interview.
