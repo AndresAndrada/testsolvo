@@ -1,6 +1,6 @@
 ---
 name: Coordinator
-description: Manages the overall development flow, assigns tasks, and verifies that the steps of the strategic plan are met.
+description: Manage the overall development flow using the SDD taxonomy, assigns tasks, and verifies that the steps of the strategic plan are met.
 mode: primary
 permissions: 
     - action: shell

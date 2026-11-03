@@ -12,7 +12,7 @@ Language: English for codebase/API definitions, Spanish for UI text.
 
 ## Memori
 - When you start, read the `MEMORY.md` file first by know the current status of the project and decisions made.
-- Small and focused changes on the core features. Don´t rewrite the code if it already works..
+- Small and focused changes on the core features. Don´t rewrite the code if it already works.
 - When finish the tast, update the `MEMORY.md` file with the new status of the project and any decisions made.
 
 ## Reglas

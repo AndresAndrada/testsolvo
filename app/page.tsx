@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import RaceSelector from "@/components/home/race-selector";
-import DriverSelector from "@/components/home/driver-selector";
-import StrategyBuilder, { type Stint } from "@/components/home/strategy-builder";
+import { type Stint } from "@/components/home/strategy-builder";
 import ResultsView from "@/components/home/results-view";
 import type { SimulationResult } from "@/types";
 import NavigationTabs from "@/components/ui/navigation-tabs";
@@ -36,7 +34,6 @@ export default function Home() {
     try {
       const res = await fetch(`/api/races/${raceId}`);
       const json = await res.json();
-      console.log("🚀 ~ handleRaceSelect ~ json:", json)
       if (json.error) {
         setError(json.error.message || t('page.errorLoadingRace'));
         return;
