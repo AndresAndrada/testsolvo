@@ -1,5 +1,7 @@
 # F1 Race Strategist - Project Memory
 
+Project record between sessions. Maximum ~50 lines: summarize or remove content that is no longer relevant.
+
 ## Current Status
 - Database: PostgreSQL (`f1_race_strategist`) in Docker, verified via HeidiSQL and Sequelize CLI (`db:migrate` up to date).
 - UI/UX: Navbar extracted; language toggle added; setup instructions ready for `components/ui/navigation-tabs.tsx`.
